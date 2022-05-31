@@ -1,29 +1,37 @@
 const http = require('http');
 const fs = require('fs')
-const path = require("path");
+const url = require('url');
+const querystring = require('querystring');
 const figlet = require('figlet')
 
 const server = http.createServer((req, res) => {
-  const myURL = new URL(req.url, "http://localhost:8000/)");
-  const page = myURL.pathname;
-  const params = myURL.searchParams;
-  const extension = path.extname(req.url);
-  const fileName = req.url.slice(1) || "index";
-  let filePath = fileName;
-  let contentType;
-  switch (extension) {
-    case ".css":
-      contentType = "text/css";
-      break;
-    case ".js":
-      contentType = "text/javascript";
-      break;
-    default:
-      filePath = `${fileName}.html`;
-      contentType = "text/html";
-  };
-  if (page == '/api') {
-      if(params.get("student") == 'leon'){
+  const page = url.parse(req.url).pathname;
+  const params = querystring.parse(url.parse(req.url).query);
+  console.log(page);
+  if (page == '/') {
+    fs.readFile('index.html', function(err, data) {
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      res.end();
+    });
+  }
+  else if (page == '/otherpage') {
+    fs.readFile('otherpage.html', function(err, data) {
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      res.end();
+    });
+  }
+  else if (page == '/otherotherpage') {
+    fs.readFile('otherotherpage.html', function(err, data) {
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      res.end();
+    });
+  }
+  else if (page == '/api') {
+    if('student' in params){
+      if(params['student']== 'leon'){
         res.writeHead(200, {'Content-Type': 'application/json'});
         const objToJson = {
           name: "leon",
@@ -31,8 +39,8 @@ const server = http.createServer((req, res) => {
           currentOccupation: "Baller"
         }
         res.end(JSON.stringify(objToJson));
-      }
-      else {
+      }//student = leon
+      else if(params['student'] != 'leon'){
         res.writeHead(200, {'Content-Type': 'application/json'});
         const objToJson = {
           name: "unknown",
@@ -40,21 +48,30 @@ const server = http.createServer((req, res) => {
           currentOccupation: "unknown"
         }
         res.end(JSON.stringify(objToJson));
-      }
-    }
-  else {
-    fs.readFile(filePath, function(err, data) {
+      }//student != leon
+    }//student if
+  }//else if
+  else if (page == '/css/style.css'){
+    fs.readFile('css/style.css', function(err, data) {
+      res.write(data);
+      res.end();
+    });
+  }else if (page == '/js/main.js'){
+    fs.readFile('js/main.js', function(err, data) {
+      res.writeHead(200, {'Content-Type': 'text/javascript'});
+      res.write(data);
+      res.end();
+    });
+  }else{
+    figlet('404!!', function(err, data) {
       if (err) {
-        console.log('Something went wrong...');
-        console.dir(err);
-        figlet("404!", function(err, data) {
-          res.end(data);
-        })
-        return;
-    }
-      res.writeHead(200, {'Content-Type': contentType});
-      res.end(data);
-    })
+          console.log('Something went wrong...');
+          console.dir(err);
+          return;
+      }
+      res.write(data);
+      res.end();
+    });
   }
 });
 
