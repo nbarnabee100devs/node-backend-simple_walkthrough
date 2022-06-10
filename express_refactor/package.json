@@ -1,7 +1,7 @@
 {
   "name": "backend-simple_walkthrough",
   "version": "1.0.0",
-  "description": "Files accompanying my blog post about the first #100Devs node assignment",
+  "description": "Files accompanying my blog post about the first #100Devs node assignment, redesigned to use Express.js",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
